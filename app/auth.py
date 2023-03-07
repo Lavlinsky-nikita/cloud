@@ -63,6 +63,7 @@ def register():
     if request.method == 'POST':
         user = User(**params())
         user.set_password(user.password)
+        user.role_id = 2
         try:
             db.session.add(user)
             db.session.commit()

@@ -14,15 +14,12 @@ class User(db.Model, UserMixin):
     login = db.Column(db.String(40), nullable=False)
     password = db.Column(db.String(250), nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    role_id = db.Column(db.Integer, nullable=False)
     
     def set_password(self, password: str):
         self.password = generate_password_hash(password)
 
     def check_password(self, password: str):
         return check_password_hash(self.password, password)
-
-
-
-    
 
 
