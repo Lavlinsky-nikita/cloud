@@ -8,7 +8,7 @@ from models import User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-USER_PARAMS = ['login', 'password', 'name',]
+USER_PARAMS = ['login', 'password', 'name']
 
 def params():
     return { p: request.form.get(p) for p in USER_PARAMS }
