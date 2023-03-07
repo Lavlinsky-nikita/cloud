@@ -1,6 +1,6 @@
 SECRET_KEY = 'e1c6fe5819c4bc8857e2cbce963a7be5904692eba862d1a809f195710aff5cdc'
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://admin:admin@127.0.0.1:3307/cloud_exam_db'
+SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://postgres:1234@127.0.0.1:54321/my_db'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = True
 

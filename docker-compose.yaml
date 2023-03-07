@@ -2,38 +2,45 @@ version: '3'
 
 services:
 
-  cloud_exam_db: #Имя сервиса
-    container_name: cloud_exam_db #Имя с которым запустится контейнер
-    hostname: cloud_exam_db #Имя "хоста" которым будет считать себя контейнер
-    image: mysql:latest #Образ из которого запускается контейнер
-    volumes: #Подключаемые директории
-      - dbdata:/var/lib/mysql #Директории вида хост_директория:директория_контейнера
-      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
-    environment: #переменные окружения
-      MYSQL_ROOT_PASSWORD: 12345678
-      MYSQL_USER: admin
-      MYSQL_HOST: cloud_exam_db
-      MYSQL_PASSWORD: admin
-      MYSQL_DATABASE: cloud_exam_db
+  db:
+    container_name: exam_db
+    image: postgres
+    hostname: db
+    volumes:
+      - ../volume/db/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=my_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "54321:5432"
     networks: 
       - default
-    ports: # Сопоставление портов хост-машины и контейнера
-      - 3307:3306
-    restart: unless-stopped
-  cloud_exam_app:
-    container_name: cloud_exam_app
-    hostname: cloud_exam_app
-    image: lavlinsky2402/cloud_exam:latest
-    build: # Параметры для сборки приложения
-      context: ./ # Каталог, используемый для сборки
-      dockerfile: Dockerfile # Файл, используемый для сборки образа приложения
+  pgadmin:
+    container_name: pgadmin_container
+    hostname: pgadmin
+    image: dpage/pgadmin4:6.14
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "lnv201351@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "1234"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - ../volume/pg:/var/lib/pgadmin
     ports:
-     - 10091:80
-    # networks:
-    #   - cloud_exam-net
-    restart: unless-stopped
-    depends_on: # Указание на зависимость сервиса от другого сервиса
-      - cloud_exam_db
+      - "5050:80"
+    restart: on-failure
+    networks:
+      - default
+  examapi:
+    build: .
+    ports:
+      - 5000:5000
+    networks: 
+      - default
+    container_name: 
+      examapi 
+    depends_on: 
+      - db
 networks:
   default:
     driver: bridge
