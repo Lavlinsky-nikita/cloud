@@ -62,7 +62,7 @@ def logout():
 def register():
     if request.method == 'POST':
         user = User(**params())
-        user.set_password(user.password_hash)
+        user.set_password(user.password)
         try:
             db.session.add(user)
             db.session.commit()
