@@ -1,12 +1,17 @@
 import functools
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-
+from app import db
+from sqlalchemy import exc
 
 from models import User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
+USER_PARAMS = ['login', 'password', 'name',]
+
+def params():
+    return { p: request.form.get(p) for p in USER_PARAMS }
 
 def init_login_manager(app):
     login_manager = LoginManager()
@@ -51,3 +56,22 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        user = User(**params())
+        user.set_password(user.password_hash)
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except exc.SQLAlchemyError:
+            db.session.rollback()
+            flash('При сохранении данных возникла ошибка.', 'danger')
+            return redirect(url_for('auth.register'))
+        login_user(user)
+        flash('Вы успешно зарегистрировались.', 'success')
+        next = request.args.get('next')
+        return redirect(next or url_for('index'))
+    return render_template('auth/register.html')
